@@ -1,3 +1,4 @@
+import 'package:cipherx_expense_tracker/core/helpers/connectivity_helper.dart';
 import 'package:cipherx_expense_tracker/core/theme/app_colors.dart';
 import 'package:cipherx_expense_tracker/views/splash/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,28 +15,68 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder:
-              (context, animation, secondaryAnimation) => const WelcomeScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = 0.0;
-            const end = 1.0;
-            const curve = Curves.easeInOut;
+    _checkConnectivityAndNavigate();
+  }
 
-            var tween = Tween(
-              begin: begin,
-              end: end,
-            ).chain(CurveTween(curve: curve));
-            var fadeAnimation = animation.drive(tween);
+  Future<void> _checkConnectivityAndNavigate() async {
+    bool isConnected = await isNetworkAvailable();
+    if (isConnected) {
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder:
+                (context, animation, secondaryAnimation) =>
+                    const WelcomeScreen(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              const begin = 0.0;
+              const end = 1.0;
+              const curve = Curves.easeInOut;
 
-            return FadeTransition(opacity: fadeAnimation, child: child);
-          },
-        ),
-      );
-    });
+              var tween = Tween(
+                begin: begin,
+                end: end,
+              ).chain(CurveTween(curve: curve));
+              var fadeAnimation = animation.drive(tween);
+
+              return FadeTransition(opacity: fadeAnimation, child: child);
+            },
+          ),
+        );
+      });
+    } else {
+      Future.delayed(const Duration(seconds: 2), () {
+        showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                title: Text(
+                  "No Internet Connection",
+                  style: GoogleFonts.inter(fontSize: 20),
+                ),
+                content: Text(
+                  "Please check your network connection and try again.",
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed:
+                        () => Navigator.pushReplacementNamed(context, '/'),
+                    child: Text(
+                      "Retry",
+                      style: GoogleFonts.inter(color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ),
+        );
+      });
+    }
   }
 
   @override
