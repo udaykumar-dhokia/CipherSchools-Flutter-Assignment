@@ -42,6 +42,12 @@ dependencies:
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.1
   google_sign_in: ^6.3.0
+  cloud_firestore: ^5.6.5
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  intl: ^0.20.2
+  flutter_slidable: ^4.0.0
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:

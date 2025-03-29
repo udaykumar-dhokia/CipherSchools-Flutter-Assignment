@@ -1,7 +1,9 @@
+import 'package:cipherx_expense_tracker/core/helpers/auth_helper.dart';
 import 'package:cipherx_expense_tracker/core/helpers/connectivity_helper.dart';
 import 'package:cipherx_expense_tracker/core/theme/app_colors.dart';
 import 'package:cipherx_expense_tracker/views/home/home_screen.dart';
 import 'package:cipherx_expense_tracker/views/splash/welcome_screen.dart';
+import 'package:cipherx_expense_tracker/widgets/bottomnavigation_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
               PageRouteBuilder(
                 pageBuilder:
                     (context, animation, secondaryAnimation) =>
-                        const HomeScreen(),
+                        const AuthHelper(),
                 transitionsBuilder: (
                   context,
                   animation,

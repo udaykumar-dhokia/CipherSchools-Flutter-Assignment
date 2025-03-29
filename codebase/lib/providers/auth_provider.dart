@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cipherx_expense_tracker/providers/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? _user;
 
   User? get user => _user;
@@ -21,7 +23,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> loginWithGoogle(BuildContext context) async {
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return;
+      if (googleUser == null) return; // User canceled the sign-in
 
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -29,10 +31,32 @@ class AuthProvider extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
+      // Sign in with Google credentials
+      UserCredential userCredential = await _auth.signInWithCredential(
+        credential,
+      );
+
+      // Get the user's UID
+      String uid = userCredential.user!.uid;
+
+      // Check if the user already exists in Firestore
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(uid).get();
+
+      if (!userDoc.exists) {
+        // If the user does not exist, store their data in Firestore
+        await _firestore.collection('users').doc(uid).set({
+          'name': userCredential.user!.displayName ?? "Anonymous",
+          'email': userCredential.user!.email ?? "No Email",
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
       _setUserData(context);
+      Navigator.pushReplacementNamed(context, '/homepage');
     } catch (e) {
       print(e.toString());
+      throw e; // Re-throw the error to handle it in the UI
     }
   }
 
@@ -44,6 +68,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       _setUserData(context);
+      Navigator.pushReplacementNamed(context, '/homepage');
     } catch (e) {
       print(e.toString());
     }
@@ -53,15 +78,30 @@ class AuthProvider extends ChangeNotifier {
     BuildContext context,
     String email,
     String password,
+    String name, // Added name parameter
   ) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      // Create user in Firebase Authentication
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      // Get the user's UID
+      String uid = userCredential.user!.uid;
+
+      // Store user data in Firestore
+      await _firestore.collection('users').doc(uid).set({
+        'name': name,
+        'email': email,
+        'password':
+            password, // Storing password is not recommended; use hashing if necessary
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
       _setUserData(context);
+      Navigator.pushReplacementNamed(context, '/homepage');
     } catch (e) {
       print(e.toString());
+      throw e; // Re-throw the error to handle it in the UI
     }
   }
 
@@ -70,6 +110,7 @@ class AuthProvider extends ChangeNotifier {
       await _googleSignIn.signOut();
       await _auth.signOut();
       Provider.of<UserProvider>(context, listen: false).setAnonymous();
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       print(e.toString());
     }
@@ -78,10 +119,11 @@ class AuthProvider extends ChangeNotifier {
   void _setUserData(BuildContext context) {
     final user = _auth.currentUser;
     if (user != null) {
-      Provider.of<UserProvider>(
-        context,
-        listen: false,
-      ).setUser(user.uid, user.displayName ?? user.email ?? "Anonymous");
+      Provider.of<UserProvider>(context, listen: false).setUser(
+        user.uid,
+        user.displayName ?? "Anonymous",
+        user.email ?? "No Email",
+      );
     }
   }
 }
