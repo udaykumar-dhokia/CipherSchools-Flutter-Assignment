@@ -1,3 +1,5 @@
+import 'package:cipherx_expense_tracker/views/auth/login_screen.dart';
+import 'package:cipherx_expense_tracker/views/auth/signup_screen.dart';
 import 'package:cipherx_expense_tracker/views/splash/splash_screen.dart';
 import 'package:cipherx_expense_tracker/views/splash/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (context) => const SplashScreen(),
         "/welcome": (context) => const WelcomeScreen(),
+        "/login": (context) => const LoginScreen(),
+        "/signup": (context) => const SignupScreen(),
       },
     );
   }

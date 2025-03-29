@@ -1,4 +1,5 @@
 import "package:cipherx_expense_tracker/core/theme/app_colors.dart";
+import "package:cipherx_expense_tracker/views/auth/login_screen.dart";
 import "package:flutter/material.dart";
 import "package:google_fonts/google_fonts.dart";
 
@@ -27,7 +28,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    // Loop the animation indefinitely
     _controller.repeat(reverse: true);
   }
 
@@ -92,7 +92,37 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ],
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const LoginScreen(),
+                              transitionsBuilder: (
+                                context,
+                                animation,
+                                secondaryAnimation,
+                                child,
+                              ) {
+                                const begin = 0.0;
+                                const end = 1.0;
+                                const curve = Curves.easeInOut;
+
+                                var tween = Tween(
+                                  begin: begin,
+                                  end: end,
+                                ).chain(CurveTween(curve: curve));
+                                var fadeAnimation = animation.drive(tween);
+
+                                return FadeTransition(
+                                  opacity: fadeAnimation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                         icon: Icon(
                           Icons.arrow_forward_ios,
                           color: AppColors.white,
