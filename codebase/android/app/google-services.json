@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1044292579348",
+    "project_id": "cipherx-expense-tracker",
+    "storage_bucket": "cipherx-expense-tracker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044292579348:android:1fa7f299b31055f3457701",
+        "android_client_info": {
+          "package_name": "com.cipherschools.assignment"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzfrEUMEghCqOmC0Flggphie7NtFM7-W0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
